@@ -13,6 +13,106 @@
 
   if (!hero || !heroSvg || !dot) return;
 
+  /**
+   * Top bar oval pause/resume (mousemove / idle).
+   * Requirements:
+   * - RUNNING by default (no `html.user-active` class present)
+   * - mousemove: pause immediately
+   * - stop moving: resume after EXACTLY 3000ms
+   * - movement during the 3s window resets the timer
+   * - single timeout only, never multiple timers
+   * - one event listener, no polling/intervals
+   */
+  (function () {
+    var root = document.documentElement;
+    var idleTimeout = null; // single timeout variable (required)
+    var isIdle = true; // true => animation running; false => paused due to activity
+
+    // Ensure default is running.
+    root.classList.remove("user-active");
+
+    function onAnyMouseMove() {
+      // Pause immediately on first movement after idle.
+      if (isIdle) {
+        isIdle = false;
+        root.classList.add("user-active");
+      }
+
+      // Reset the single idle timer on every mousemove.
+      if (idleTimeout !== null) {
+        window.clearTimeout(idleTimeout);
+        idleTimeout = null;
+      }
+
+      idleTimeout = window.setTimeout(function () {
+        // Resume after EXACTLY 3 seconds with no mousemove.
+        root.classList.remove("user-active");
+        isIdle = true;
+        idleTimeout = null;
+      }, 3000);
+    }
+
+    // Attach exactly one listener (required).
+    window.addEventListener("mousemove", onAnyMouseMove, { passive: true });
+  })();
+
+  /**
+   * System clock (GNOME-style): HH:MM (24h) + hover date.
+   * - Updates immediately on load.
+   * - Updates exactly on minute boundaries (no per-second ticking).
+   * - Uses ONE timer only (single recursive setTimeout) to avoid drift.
+   *
+   * Formatting:
+   * - Time: HH:MM with leading zeros (e.g. 09:05)
+   * - Date: "Mon 17 Oct"
+   */
+  (function () {
+    var timeEl = document.getElementById("system-clock-time");
+    var dateEl = document.getElementById("system-clock-date");
+    if (!timeEl || !dateEl) return;
+
+    var clockTimer = null; // single timer only
+
+    function pad2(n) {
+      return n < 10 ? "0" + n : String(n);
+    }
+
+    function formatDate(d) {
+      var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return weekdays[d.getDay()] + " " + pad2(d.getDate()) + " " + months[d.getMonth()];
+    }
+
+    function renderNow() {
+      var now = new Date();
+      // Time: HH:MM (24-hour) with leading zeros.
+      timeEl.textContent = pad2(now.getHours()) + ":" + pad2(now.getMinutes());
+      // Date: Mon 17 Oct (pre-rendered so hover is instant).
+      dateEl.textContent = formatDate(now);
+    }
+
+    function scheduleNextMinute() {
+      // Clear any existing timeout (guarantee single timer).
+      if (clockTimer !== null) {
+        window.clearTimeout(clockTimer);
+        clockTimer = null;
+      }
+
+      var now = new Date();
+      // Sync to system minute boundary to avoid drift.
+      var msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+      if (msUntilNextMinute < 0) msUntilNextMinute = 0;
+
+      clockTimer = window.setTimeout(function () {
+        renderNow();
+        scheduleNextMinute();
+      }, msUntilNextMinute);
+    }
+
+    renderNow();
+    scheduleNextMinute();
+  })();
+
   var dotRadius = 24;
   var targetX = -100;
   var targetY = -100;

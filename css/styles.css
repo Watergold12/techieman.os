@@ -101,6 +101,7 @@ body {
   width: 100%;
   height: 100%;
   padding: 0 1rem;
+  position: relative;
 }
 
 /* Future feature placeholder: grey pill/oval at center (purely visual, no interaction) */
@@ -113,11 +114,72 @@ body {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
   cursor: default;
   flex-shrink: 0;
+  /* DEBUG: exaggerated breathing so it's impossible to miss */
+  transform-origin: center;
+  animation: topBarOvalBreathe 4s ease-in-out infinite;
+  animation-play-state: running;
+  will-change: transform, opacity;
 }
 
 @keyframes topBarFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes topBarOvalBreathe {
+  /* Width change >= ±10px (140px base): scaleX 0.92..1.08 */
+  0%   { transform: scaleX(0.92); opacity: 0.6; }
+  50%  { transform: scaleX(1.08); opacity: 1; }
+  100% { transform: scaleX(0.92); opacity: 0.6; }
+}
+
+/* Mouse activity control: paused immediately on movement; resumes after 3s idle (JS toggles `html.user-active`) */
+html.user-active .top-bar__center-oval {
+  animation-play-state: paused;
+}
+
+/* --------------------------------------------------------------------------
+   Top bar system clock (GNOME-style)
+   -------------------------------------------------------------------------- */
+.top-bar__clock {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #cfcfcf;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  cursor: default;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.clock__time {
+  display: inline-block;
+}
+
+/* Expansion container: width + opacity transition only, no layout shift (clock is absolutely positioned) */
+.clock__date-wrap {
+  display: inline-flex;
+  overflow: hidden;
+  width: 0;
+  opacity: 0;
+  transition: width 220ms ease, opacity 220ms ease;
+}
+
+.clock__date {
+  display: inline-block;
+  padding-right: 2px;
+}
+
+.top-bar__clock:hover .clock__date-wrap {
+  width: 86px; /* enough for \"Mon 17 Oct\" */
+  opacity: 1;
 }
 
 /* --------------------------------------------------------------------------
