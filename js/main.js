@@ -11,8 +11,6 @@
   var heroSvg = document.getElementById("hero-svg");
   var dot = document.getElementById("cursor-dot");
 
-  if (!hero || !heroSvg || !dot) return;
-
   /**
    * Top bar oval pause/resume (mousemove / idle).
    * Requirements:
@@ -113,6 +111,94 @@
     scheduleNextMinute();
   })();
 
+  /**
+   * App windows (OS-style): generic open/close by app id.
+   *
+   * Mapping:
+   * - Dock icons:  data-launch-app="about|projects|..."
+   * - Windows:     id="app-about", id="app-projects", ...
+   * - Close btn:   data-app-close="about|projects|..."
+   *
+   * Behavior:
+   * - Only ONE app window visible at a time (opening a new one closes current).
+   * - Reuses existing CSS transition (opacity/scale/blur, 200ms).
+   */
+  (function () {
+    var currentAppId = null;
+    var isAnimating = false;
+
+    function getWindowEl(appId) {
+      return document.getElementById("app-" + appId);
+    }
+
+    function openApp(appId) {
+      var win = getWindowEl(appId);
+      if (!win) return;
+      if (isAnimating) return;
+      if (currentAppId === appId && win.style.display === "block" && win.classList.contains("is-open")) return;
+
+      // If another app is open, close it first, then open the requested one.
+      if (currentAppId && currentAppId !== appId) {
+        closeApp(currentAppId, function () {
+          openApp(appId);
+        });
+        return;
+      }
+
+      isAnimating = true;
+      currentAppId = appId;
+      win.style.display = "block";
+      win.setAttribute("aria-hidden", "false");
+
+      // Launch logic: next frame add .is-open so CSS transition runs.
+      requestAnimationFrame(function () {
+        win.classList.add("is-open");
+        window.setTimeout(function () {
+          isAnimating = false;
+        }, 240); // keep existing timing (200ms + small buffer)
+      });
+    }
+
+    function closeApp(appId, done) {
+      var win = getWindowEl(appId);
+      if (!win) return;
+      if (isAnimating) return;
+      if (win.style.display !== "block") {
+        if (typeof done === "function") done();
+        return;
+      }
+
+      isAnimating = true;
+      win.classList.remove("is-open");
+
+      // After the close transition completes, fully hide the window.
+      var onDone = function (ev) {
+        if (ev.target !== win) return;
+        win.removeEventListener("transitionend", onDone);
+        win.style.display = "none";
+        win.setAttribute("aria-hidden", "true");
+        if (currentAppId === appId) currentAppId = null;
+        isAnimating = false;
+        if (typeof done === "function") done();
+      };
+      win.addEventListener("transitionend", onDone);
+    }
+
+    // Single delegated listener for dock launches (no per-app JS duplication).
+    document.addEventListener("click", function (e) {
+      var launch = e.target.closest("[data-launch-app]");
+      if (launch) {
+        e.preventDefault();
+        openApp(launch.getAttribute("data-launch-app"));
+        return;
+      }
+      var closeBtn = e.target.closest("[data-app-close]");
+      if (closeBtn) {
+        closeApp(closeBtn.getAttribute("data-app-close"));
+      }
+    });
+  })();
+
   var dotRadius = 24;
   var targetX = -100;
   var targetY = -100;
@@ -176,13 +262,15 @@
     targetY = pt.y;
   }
 
-  hero.addEventListener("mouseenter", function () {
-    startFollow();
-  });
+  if (hero && heroSvg && dot) {
+    hero.addEventListener("mouseenter", function () {
+      startFollow();
+    });
 
-  hero.addEventListener("mouseleave", function () {
-    stopFollow();
-  });
+    hero.addEventListener("mouseleave", function () {
+      stopFollow();
+    });
 
-  hero.addEventListener("mousemove", onMouseMove, { passive: true });
+    hero.addEventListener("mousemove", onMouseMove, { passive: true });
+  }
 })();

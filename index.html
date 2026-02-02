@@ -60,10 +60,10 @@
         <a class="dock-item" href="#home" aria-label="Home">
           <img src="assets/dock/home.png" alt="" width="48" height="48" />
         </a>
-        <a class="dock-item" href="#projects" aria-label="Projects">
+        <a class="dock-item" href="#projects" aria-label="Projects" data-launch-app="projects">
           <img src="assets/dock/projects.png" alt="" width="48" height="48" />
         </a>
-        <a class="dock-item" href="#about" aria-label="About">
+        <a class="dock-item" href="#about" aria-label="About" data-launch-app="about">
           <img src="assets/dock/about.svg" alt="" width="48" height="48" />
         </a>
         <a class="dock-item" href="#contact" aria-label="Contact">
@@ -72,6 +72,32 @@
       </div>
     </nav>
   </main>
+
+  <!-- App windows (hidden by default). One app for now: About. -->
+  <section class="app-window" id="app-about" aria-hidden="true" role="dialog" aria-label="About">
+    <div class="app-window__titlebar">
+      <div class="app-window__title">About</div>
+      <button class="app-window__close" type="button" data-app-close="about" aria-label="Close About">×</button>
+    </div>
+    <div class="app-window__content">
+      <p class="app-window__text">
+        This is the About app. Replace this content with your bio, stack, and highlights.
+      </p>
+    </div>
+  </section>
+
+  <!-- App window: Projects -->
+  <section class="app-window" id="app-projects" aria-hidden="true" role="dialog" aria-label="Projects">
+    <div class="app-window__titlebar">
+      <div class="app-window__title">Projects</div>
+      <button class="app-window__close" type="button" data-app-close="projects" aria-label="Close Projects">×</button>
+    </div>
+    <div class="app-window__content">
+      <p class="app-window__text">
+        Projects app placeholder. Add your featured work, links, and case studies here.
+      </p>
+    </div>
+  </section>
 
   <script src="js/main.js"></script>
 </body>
