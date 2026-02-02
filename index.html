@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>techieman.os</title>
+  <!-- Load Jaro first so headline font is ready before SVG renders -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jaro&display=block" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Fixed static background (no parallax) -->
+  <div class="background" role="img" aria-hidden="true"></div>
+
+  <!-- Boot-style fade overlay on page load -->
+  <div class="boot-overlay" aria-hidden="true"></div>
+
+  <!-- GNOME / Ubuntu-style top system bar (reusable across pages) -->
+  <header class="top-bar" role="banner">
+    <div class="top-bar__inner">
+      <!-- Future feature placeholder: subtle grey oval (pill) at center -->
+      <span class="top-bar__center-oval" aria-hidden="true"></span>
+    </div>
+  </header>
+
+  <main class="viewport">
+    <!-- Hero: center text with SVG for mask-based hover dot -->
+    <section class="hero" id="hero">
+      <svg class="hero-svg" id="hero-svg" viewBox="0 0 1800 320" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <!-- Mask for dot: white = visible, black = hidden. Dot shows only inside text. -->
+          <mask id="dotMask">
+            <rect width="100%" height="100%" fill="black" />
+            <text class="hero-text-mask" font-family="Jaro" x="50%" y="50%" text-anchor="middle" dominant-baseline="central" fill="white">Welcome to techieman.os</text>
+          </mask>
+        </defs>
+        <!-- Visible heading text (white / off-white) -->
+        <text class="hero-text" font-family="Jaro" x="50%" y="50%" text-anchor="middle" dominant-baseline="central">Welcome to techieman.os</text>
+        <!-- Black dot; only visible inside text shape via mask -->
+        <g mask="url(#dotMask)">
+          <circle id="cursor-dot" class="cursor-dot" r="24" cx="-100" cy="-100" />
+        </g>
+      </svg>
+    </section>
+
+    <!-- Bottom dock (Linux/macOS style) -->
+    <nav class="dock" aria-label="Application dock">
+      <div class="dock-inner">
+        <a class="dock-item" href="#home" aria-label="Home">
+          <img src="assets/dock/home.png" alt="" width="48" height="48" />
+        </a>
+        <a class="dock-item" href="#projects" aria-label="Projects">
+          <img src="assets/dock/projects.png" alt="" width="48" height="48" />
+        </a>
+        <a class="dock-item" href="#about" aria-label="About">
+          <img src="assets/dock/about.svg" alt="" width="48" height="48" />
+        </a>
+        <a class="dock-item" href="#contact" aria-label="Contact">
+          <img src="assets/dock/contact.svg" alt="" width="48" height="48" />
+        </a>
+      </div>
+    </nav>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

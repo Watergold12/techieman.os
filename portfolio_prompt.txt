@@ -1,0 +1,58 @@
+Act as a senior front-end engineer and UI/UX designer with deep experience in Linux desktop environments (GNOME, KDE, i3) and modern web animations.
+I am building a portfolio website styled like a minimal Linux operating system desktop.
+
+Overall Theme
+ * The homepage should visually feel like a Linux OS login/desktop screen
+ * Dark, monochrome, futuristic aesthetic
+ * Minimal UI, glassmorphism where appropriate
+ * No clutter, no gradients unless subtle
+ * Smooth 60fps animations only
+
+Background
+ * I already have a static abstract black-and-white background image
+ * The background must remain fixed and untouched
+ * No parallax on background
+
+Main Text (Critical Feature)
+ * Centered headline text: “Welcome to techieman.os”
+ * Font should resemble a terminal / sci-fi / OS-style font
+ * Text color: white or slightly off-white
+
+Hover Interaction (VERY IMPORTANT)
+ * When the cursor hovers over the text, a small black circular dot (like a magnet or cursor gravity point) must appear
+ * This dot must follow the cursor smoothly
+ * The dot must be strictly clipped to the text shape
+ * The dot must NOT appear outside the text area
+ * The effect should feel like the cursor is “distorting” or “activating” the text
+ * No background interaction — ONLY the text reacts
+ * Use masking, clipping paths, or shader-like logic if needed
+
+Dock / Icons Section
+ * Bottom-center dock similar to Linux / macOS dock
+ * Icons already exist (home, terminal, files, projects, etc.)
+ * Dock should have slight blur + translucent background
+
+Icon Hover Animation
+ * On hover, icons should translate slightly upward on the Y-axis
+ * Add subtle easing (not springy, not bouncy)
+ * Optional: tiny scale-up (max 1.05)
+ * Icons must return smoothly to original position
+
+Linux Flavor Details (Fill Gaps Creatively)
+ * Add small Linux-inspired micro-details such as:
+   * Subtle boot-like fade-in animation on page load
+   * Minimal status-bar feel (without clutter)
+   * Desktop-environment vibe (GNOME/KDE inspiration)
+ * Do NOT turn this into a fake OS — it’s a portfolio, not a simulator
+
+Technical Expectations
+ * Clean, modular HTML structure
+ * CSS animations preferred; JS only when required
+ * No external heavy animation libraries unless absolutely necessary
+ * Prioritize performance and readability
+
+Output Expectation
+ * Generate the full homepage implementation
+ * Focus heavily on hover interactions and polish
+ * Write clean, commented, production-quality code
+ * Assume all images and icons are already available locally

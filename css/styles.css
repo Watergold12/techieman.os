@@ -1,0 +1,249 @@
+/* ==========================================================================
+   techieman.os — Linux-style portfolio homepage
+   Dark, monochrome, minimal. 60fps-friendly (transform/opacity only).
+   ========================================================================== */
+
+:root {
+  --bg-overlay: rgba(5, 5, 8, 0.85);
+  --text-primary: #e8e8e8;
+  --text-muted: #a0a0a0;
+  --dot-fill: #0a0a0a;
+  --dock-bg: rgba(18, 18, 22, 0.72);
+  --dock-border: rgba(255, 255, 255, 0.06);
+  --dock-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  /* Top bar (GNOME-style) */
+  --top-bar-bg: rgba(17, 17, 17, 0.96);
+  --top-bar-height: 34px;
+  --top-bar-oval-bg: #3a3a3a;
+  --top-bar-oval-width: 140px;
+  --top-bar-oval-height: 20px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "JetBrains Mono", "IBM Plex Mono", "Fira Code", "Consolas", monospace;
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Background: static B&W image, fixed, no parallax
+   -------------------------------------------------------------------------- */
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:url("../assets/coolbackgrounds-unsplash-zeller.jpg") center center / cover no-repeat;
+}
+
+/* Fallback if image missing: subtle gradient */
+.background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(30, 30, 35, 0.6) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Boot-style fade-in on load
+   -------------------------------------------------------------------------- */
+.boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: #000;
+  animation: bootFade 1.2s var(--ease-out) forwards;
+  pointer-events: none;
+}
+
+@keyframes bootFade {
+  0% { opacity: 1; }
+  70% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   GNOME / Ubuntu-style top system bar (reusable across pages)
+   -------------------------------------------------------------------------- */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: var(--top-bar-height);
+  z-index: 5;
+  background: var(--top-bar-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+  animation: topBarFadeIn 0.4s var(--ease-out) 0.3s both;
+  pointer-events: auto;
+}
+
+.top-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 1rem;
+}
+
+/* Future feature placeholder: grey pill/oval at center (purely visual, no interaction) */
+.top-bar__center-oval {
+  display: block;
+  width: var(--top-bar-oval-width);
+  height: var(--top-bar-oval-height);
+  border-radius: 9999px;
+  background: var(--top-bar-oval-bg);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+  cursor: default;
+  flex-shrink: 0;
+}
+
+@keyframes topBarFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   Main viewport (above background, below overlay until animation ends)
+   -------------------------------------------------------------------------- */
+.viewport {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 100px;
+}
+
+/* --------------------------------------------------------------------------
+   Hero: centered OS-style heading + SVG hover-dot area
+   -------------------------------------------------------------------------- */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  user-select: none;
+}
+
+.hero-svg {
+  width: min(230vw, 2250px);
+  height: auto;
+  min-height: 100px;
+}
+
+/* Visible title — Jaro only (no fallback), white/off-white; font-size 2× */
+.hero-text {
+  font-family: "Jaro";
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-weight: 400;
+  fill: var(--text-primary);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+/* Mask text: same metrics as .hero-text so dot aligns exactly; Jaro only; font-size 2× */
+.hero-text-mask {
+  font-family: "Jaro";
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Cursor dot: black circle, only visible inside text (via mask in HTML) */
+.cursor-dot {
+  fill: var(--dot-fill);
+  transform-origin: center;
+  transition: opacity 0.15s var(--ease-smooth);
+}
+
+.cursor-dot.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Dock: bottom-center, glassmorphism, Linux/macOS style
+   -------------------------------------------------------------------------- */
+.dock {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.dock-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 8px 14px 10px;
+  background: var(--dock-bg);
+  border: 1px solid var(--dock-border);
+  border-radius: 16px;
+  box-shadow: var(--dock-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Icon hover: translate up, slight scale, smooth easing, no bounce */
+.dock-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: transform 0.2s var(--ease-smooth), color 0.2s ease;
+}
+
+.dock-item:hover,
+.dock-item:focus-visible {
+  transform: translateY(-8px) scale(1.05);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.dock-item img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .boot-overlay {
+    animation-duration: 0.4s;
+  }
+  .top-bar {
+    animation: none;
+  }
+  .cursor-dot {
+    transition: none;
+  }
+  .dock-item:hover,
+  .dock-item:focus-visible {
+    transform: none;
+  }
+}
