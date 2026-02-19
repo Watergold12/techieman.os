@@ -123,30 +123,55 @@
    * - Only ONE app window visible at a time (opening a new one closes current).
    * - Reuses existing CSS transition (opacity/scale/blur, 200ms).
    */
+  /**
+   * App windows (OS-style): multi-window, focus, and stacking.
+   */
   (function () {
-    var currentAppId = null;
-    var isAnimating = false;
+    var globalZIndex = 100; // Starting z-index for windows
+    var isAnimating = false; // Prevents rapid-fire animation glitches
 
     function getWindowEl(appId) {
       return document.getElementById("app-" + appId);
     }
 
+    /**
+     * Brings the specified window to the front.
+     * Updates z-index and adds .is-focused class.
+     */
+    function focusWindow(win) {
+      if (!win) return;
+      globalZIndex++;
+      win.style.zIndex = globalZIndex;
+
+      // Update classes for all windows
+      var allWindows = document.querySelectorAll(".app-window");
+      allWindows.forEach(function (w) {
+        if (w === win) {
+          w.classList.add("is-focused");
+          w.setAttribute("aria-current", "page"); // Accessibility hint
+        } else {
+          w.classList.remove("is-focused");
+          w.removeAttribute("aria-current");
+        }
+      });
+    }
+
     function openApp(appId) {
       var win = getWindowEl(appId);
       if (!win) return;
-      if (isAnimating) return;
-      if (currentAppId === appId && win.style.display === "block" && win.classList.contains("is-open")) return;
-
-      // If another app is open, close it first, then open the requested one.
-      if (currentAppId && currentAppId !== appId) {
-        closeApp(currentAppId, function () {
-          openApp(appId);
-        });
+      
+      // If already open, just focus it
+      if (win.style.display === "block" && win.classList.contains("is-open")) {
+        focusWindow(win);
         return;
       }
 
+      if (isAnimating) return;
       isAnimating = true;
-      currentAppId = appId;
+
+      // Bring to front immediately before showing
+      focusWindow(win);
+      
       win.style.display = "block";
       win.setAttribute("aria-hidden", "false");
 
@@ -155,36 +180,113 @@
         win.classList.add("is-open");
         window.setTimeout(function () {
           isAnimating = false;
-        }, 240); // keep existing timing (200ms + small buffer)
+        }, 240); // match CSS transition duration
       });
     }
 
-    function closeApp(appId, done) {
+    function closeApp(appId) {
       var win = getWindowEl(appId);
       if (!win) return;
-      if (isAnimating) return;
-      if (win.style.display !== "block") {
-        if (typeof done === "function") done();
-        return;
-      }
+      if (isAnimating) return; // Optional: could allow closing during anim if careful
+      if (win.style.display !== "block") return;
 
       isAnimating = true;
       win.classList.remove("is-open");
+      win.classList.remove("is-focused");
 
-      // After the close transition completes, fully hide the window.
       var onDone = function (ev) {
         if (ev.target !== win) return;
         win.removeEventListener("transitionend", onDone);
         win.style.display = "none";
         win.setAttribute("aria-hidden", "true");
-        if (currentAppId === appId) currentAppId = null;
         isAnimating = false;
-        if (typeof done === "function") done();
       };
       win.addEventListener("transitionend", onDone);
     }
 
-    // Single delegated listener for dock launches (no per-app JS duplication).
+    // ----------------------------------------------------------------------
+    // Dragging Logic
+    // ----------------------------------------------------------------------
+    var dragWin = null;
+    var dragOffsetX = 0;
+    var dragOffsetY = 0;
+
+    function onDragMove(e) {
+      if (!dragWin) return;
+      e.preventDefault(); // Stop text selection/scrolling during drag
+
+      // Calculate new center position based on mouse position - offset
+      var newX = e.clientX - dragOffsetX;
+      var newY = e.clientY - dragOffsetY;
+
+      // Constraints (Viewport Bounds)
+      // Keep the window mostly on screen.
+      // We are manipulating the center (left/top are center because of translate(-50%, -50%)).
+      var rect = dragWin.getBoundingClientRect();
+      var halfW = rect.width / 2;
+      var halfH = rect.height / 2;
+      
+      var minX = halfW; // Keep left edge at 0
+      var maxX = window.innerWidth - halfW; // Keep right edge at viewportWidth
+      var minY = halfH; // Keep top edge at 0 (or under top bar)
+      var maxY = window.innerHeight - halfH - 40; // Keep some of it visible at bottom
+
+      // Apply constraints
+      if (newX < minX) newX = minX;
+      if (newX > maxX) newX = maxX;
+      if (newY < minY) newY = minY;
+      if (newY > maxY) newY = maxY;
+
+      dragWin.style.left = newX + "px";
+      dragWin.style.top = newY + "px";
+    }
+
+    function onDragEnd() {
+      if (dragWin) {
+        dragWin = null;
+        document.documentElement.style.cursor = ""; // Reset global cursor
+        window.removeEventListener("mousemove", onDragMove);
+        window.removeEventListener("mouseup", onDragEnd);
+      }
+    }
+
+    // Attach click listener to ALL windows for focus handling AND dragging
+    // We use a delegated listener on document body for simplicity
+    document.addEventListener("mousedown", function(e) {
+      var win = e.target.closest(".app-window");
+      if (!win) return;
+
+      // 1. Always bring to front on click
+      if (!win.classList.contains("is-focused")) {
+        focusWindow(win);
+      }
+
+      // 2. Check for Title Bar Drag Start
+      var titleBar = e.target.closest(".app-window__titlebar");
+      // Ensure we didn't click the close button or other controls
+      if (titleBar && !e.target.closest("button")) {
+        e.preventDefault();
+        
+        dragWin = win;
+        
+        // Calculate the offset of the mouse from the Center of the window
+        // (Since left/top define the center due to CSS transform)
+        var rect = win.getBoundingClientRect();
+        var centerX = rect.left + rect.width / 2;
+        var centerY = rect.top + rect.height / 2;
+
+        dragOffsetX = e.clientX - centerX;
+        dragOffsetY = e.clientY - centerY;
+
+        // Attach global listeners for move/up
+        document.documentElement.style.cursor = "move"; // Feedback
+        window.addEventListener("mousemove", onDragMove, { passive: false });
+        // Use the same function reference for cleanup
+        window.addEventListener("mouseup", onDragEnd);
+      }
+    });
+
+    // Delegated listener for dock launches and generic close buttons
     document.addEventListener("click", function (e) {
       var launch = e.target.closest("[data-launch-app]");
       if (launch) {
@@ -197,6 +299,123 @@
         closeApp(closeBtn.getAttribute("data-app-close"));
       }
     });
+    // ----------------------------------------------------------------------
+    // Terminal Logic (Fake Shell)
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Terminal Logic (Fake Shell)
+    // ----------------------------------------------------------------------
+    (function initTerminal() {
+      var termInput = document.getElementById("terminal-input");
+      var termOutput = document.getElementById("terminal-output");
+      if (!termInput || !termOutput) return;
+
+      var history = [];
+      var historyIndex = -1;
+
+      function printLine(text, type) {
+        var div = document.createElement("div");
+        div.className = "terminal-line " + (type || "");
+        div.textContent = text;
+        termOutput.appendChild(div);
+        termOutput.scrollTop = termOutput.scrollHeight;
+      }
+
+      function executeCommand(input) {
+        var clean = input.trim();
+        if (!clean) return;
+
+        // Visual: echo command
+        printLine("techieman@os:~$ " + clean);
+        
+        // History management
+        if (history[history.length - 1] !== clean) {
+          history.push(clean);
+        }
+        historyIndex = history.length;
+
+        // Parsing: simple space split
+        var parts = clean.split(/\s+/);
+        var cmd = parts[0].toLowerCase();
+        var arg = parts.slice(1).join(" ").toLowerCase();
+
+        switch (cmd) {
+          case "help":
+            printLine("Available commands:", "system");
+            printLine("  open [app]   - Launch an app (about, projects, contact)");
+            printLine("  date         - Show current date/time");
+            printLine("  whoami       - Display user info");
+            printLine("  clear        - Clear terminal output");
+            printLine("  help         - Show this list");
+            break;
+
+          case "clear":
+            termOutput.innerHTML = "";
+            break;
+
+          case "date":
+            printLine(new Date().toLocaleString());
+            break;
+
+          case "whoami":
+            printLine("visitor@techieman.os");
+            break;
+
+          case "open":
+            if (!arg) {
+              printLine("Error: Missing app name. Usage: open [app]", "error");
+            } else {
+              var targetId = "app-" + arg;
+              var targetEl = document.getElementById(targetId);
+              if (targetEl) {
+                printLine("Launching " + arg + "...", "system");
+                // IMPORTANT: ensure openApp is accessible in this scope
+                // It is, because initTerminal is inside the main IIFE where openApp is defined.
+                openApp(arg);
+              } else {
+                printLine("Error: App '" + arg + "' not found.", "error");
+              }
+            }
+            break;
+
+          default:
+            printLine("Command not found: " + cmd + ". Type 'help'.", "error");
+        }
+      }
+
+      // Event Listener: Keydown
+      termInput.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          var val = termInput.value;
+          executeCommand(val);
+          termInput.value = "";
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (historyIndex > 0) {
+            historyIndex--;
+            termInput.value = history[historyIndex];
+          }
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (historyIndex < history.length - 1) {
+            historyIndex++;
+            termInput.value = history[historyIndex];
+          } else {
+            historyIndex = history.length;
+            termInput.value = "";
+          }
+        }
+      });
+      
+      // Auto-focus input when clicking anywhere in the terminal window
+      var termWin = document.getElementById("app-terminal");
+      if (termWin) {
+        termWin.addEventListener("click", function() {
+           termInput.focus();
+        });
+      }
+    })();
   })();
 
   var dotRadius = 24;

@@ -57,17 +57,20 @@
     <!-- Bottom dock (Linux/macOS style) -->
     <nav class="dock" aria-label="Application dock">
       <div class="dock-inner">
+        <a class="dock-item" href="#terminal" aria-label="Terminal" data-launch-app="terminal">
+          <img src="assets/dock/terminal.png" alt=""  width="48" height="48"/>
+        </a>
         <a class="dock-item" href="#home" aria-label="Home">
-          <img src="assets/dock/home.png" alt="" width="48" height="48" />
+          <img src="assets/dock/home2.png" alt="" width="48" height="48" />
         </a>
         <a class="dock-item" href="#projects" aria-label="Projects" data-launch-app="projects">
           <img src="assets/dock/projects.png" alt="" width="48" height="48" />
         </a>
         <a class="dock-item" href="#about" aria-label="About" data-launch-app="about">
-          <img src="assets/dock/about.svg" alt="" width="48" height="48" />
+          <img src="assets/dock/about2.png" alt="" width="48" height="48" />
         </a>
-        <a class="dock-item" href="#contact" aria-label="Contact">
-          <img src="assets/dock/contact.svg" alt="" width="48" height="48" />
+        <a class="dock-item" href="#contact" aria-label="Contact" data-launch-app="contact">
+          <img src="assets/dock/contacts2.png" alt="" width="48" height="48" />
         </a>
       </div>
     </nav>
@@ -79,10 +82,18 @@
       <div class="app-window__title">About</div>
       <button class="app-window__close" type="button" data-app-close="about" aria-label="Close About">×</button>
     </div>
-    <div class="app-window__content">
-      <p class="app-window__text">
-        This is the About app. Replace this content with your bio, stack, and highlights.
-      </p>
+    <div class="app-window__body">
+      <aside class="app-window__sidebar">
+        <div class="app-window__sidebar-item active">Overview</div>
+        <div class="app-window__sidebar-item">Bio</div>
+        <div class="app-window__sidebar-item">Skills</div>
+        <div class="app-window__sidebar-item">Experience</div>
+      </aside>
+      <div class="app-window__content">
+        <p class="app-window__text">
+          This is the About app. Replace this content with your bio, stack, and highlights.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -92,10 +103,57 @@
       <div class="app-window__title">Projects</div>
       <button class="app-window__close" type="button" data-app-close="projects" aria-label="Close Projects">×</button>
     </div>
-    <div class="app-window__content">
-      <p class="app-window__text">
-        Projects app placeholder. Add your featured work, links, and case studies here.
-      </p>
+    <div class="app-window__body">
+      <aside class="app-window__sidebar">
+        <div class="app-window__sidebar-item active">Featured</div>
+        <div class="app-window__sidebar-item">Web Apps</div>
+        <div class="app-window__sidebar-item">Mobile</div>
+        <div class="app-window__sidebar-item">Open Source</div>
+      </aside>
+      <div class="app-window__content">
+        <p class="app-window__text">
+          Projects app placeholder. Add your featured work, links, and case studies here.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- App window: Contact -->
+  <section class="app-window" id="app-contact" aria-hidden="true" role="dialog" aria-label="Contact">
+    <div class="app-window__titlebar">
+      <div class="app-window__title">Contact</div>
+      <button class="app-window__close" type="button" data-app-close="contact" aria-label="Close Contact">×</button>
+    </div>
+    <div class="app-window__body">
+      <aside class="app-window__sidebar">
+        <div class="app-window__sidebar-item active">Email</div>
+        <div class="app-window__sidebar-item">LinkedIn</div>
+        <div class="app-window__sidebar-item">GitHub</div>
+        <div class="app-window__sidebar-item">Twitter</div>
+      </aside>
+      <div class="app-window__content">
+        <p class="app-window__text">
+          Contact app placeholder. Reach out via email or social media.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- App window: Terminal -->
+  <section class="app-window terminal-window" id="app-terminal" aria-hidden="true" role="dialog" aria-label="Terminal">
+    <div class="app-window__titlebar">
+      <div class="app-window__title">Terminal</div>
+      <button class="app-window__close" type="button" data-app-close="terminal" aria-label="Close Terminal">×</button>
+    </div>
+    <div class="app-window__content terminal-content">
+      <div class="terminal-output" id="terminal-output">
+        <div class="terminal-line system">techieman.os v1.0.0</div>
+        <div class="terminal-line system">Type 'help' for a list of commands.</div>
+      </div>
+      <div class="terminal-input-area">
+        <span class="terminal-prompt">techieman@os:~$</span>
+        <input type="text" class="terminal-input" id="terminal-input" autocomplete="off" spellcheck="false" autofocus />
+      </div>
     </div>
   </section>
 
