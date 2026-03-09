@@ -80,7 +80,10 @@
   <section class="app-window" id="app-about" aria-hidden="true" role="dialog" aria-label="About">
     <div class="app-window__titlebar">
       <div class="app-window__title">About</div>
-      <button class="app-window__close" type="button" data-app-close="about" aria-label="Close About">×</button>
+      <div class="app-window__controls">
+        <button class="app-window__minimize" type="button" data-app-minimize="about" aria-label="Minimize About">–</button>
+        <button class="app-window__close" type="button" data-app-close="about" aria-label="Close About">×</button>
+      </div>
     </div>
     <div class="app-window__content">
       <p class="app-window__text">
@@ -93,7 +96,10 @@
   <section class="app-window" id="app-projects" aria-hidden="true" role="dialog" aria-label="Projects">
     <div class="app-window__titlebar">
       <div class="app-window__title">Projects</div>
-      <button class="app-window__close" type="button" data-app-close="projects" aria-label="Close Projects">×</button>
+      <div class="app-window__controls">
+        <button class="app-window__minimize" type="button" data-app-minimize="projects" aria-label="Minimize Projects">–</button>
+        <button class="app-window__close" type="button" data-app-close="projects" aria-label="Close Projects">×</button>
+      </div>
     </div>
     <div class="app-window__content">
       <p class="app-window__text">
@@ -106,7 +112,10 @@
   <section class="app-window terminal-window" id="app-terminal" aria-hidden="true" role="dialog" aria-label="Terminal">
     <div class="app-window__titlebar">
       <div class="app-window__title">Terminal</div>
-      <button class="app-window__close" type="button" data-app-close="terminal" aria-label="Close Terminal">×</button>
+      <div class="app-window__controls">
+        <button class="app-window__minimize" type="button" data-app-minimize="terminal" aria-label="Minimize Terminal">–</button>
+        <button class="app-window__close" type="button" data-app-close="terminal" aria-label="Close Terminal">×</button>
+      </div>
     </div>
     <div class="app-window__content terminal-content">
       <div id="terminal-output"></div>

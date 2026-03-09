@@ -184,6 +184,16 @@
       win.addEventListener("transitionend", onDone);
     }
 
+    function minimizeAllWindows() {
+      var windows = document.querySelectorAll(".app-window.is-open");
+      windows.forEach(function (win) {
+        win.classList.remove("is-open");
+        win.style.display = "none";
+        win.setAttribute("aria-hidden", "true");
+      });
+      currentAppId = null;
+    }
+
     // Single delegated listener for dock launches (no per-app JS duplication).
     document.addEventListener("click", function (e) {
       var launch = e.target.closest("[data-launch-app]");
@@ -205,6 +215,16 @@
       if (closeBtn) {
         closeApp(closeBtn.getAttribute("data-app-close"));
       }
+      var minimizeBtn = e.target.closest("[data-app-minimize]");
+      if (minimizeBtn) {
+        var appId = minimizeBtn.getAttribute("data-app-minimize");
+        var win = document.getElementById("app-" + appId);
+        if (win) {
+          win.classList.remove("is-open");
+          win.style.display = "none";
+          win.setAttribute("aria-hidden", "true");
+        }
+      }
     });
 
     /**
@@ -224,13 +244,38 @@
           // Simple response logic
           var response = document.createElement("div");
           if (cmd === "help") {
-            response.textContent = "Available commands: help, clear, about, projects, contact";
+            response.textContent = "Available commands: help, clear, about, projects, contact, exit, home";
           } else if (cmd === "clear") {
             terminalOutput.innerHTML = "";
             response = null;
           } else if (cmd === "about" || cmd === "projects" || cmd === "contact") {
             response.textContent = "Opening " + cmd + "...";
             openApp(cmd);
+          } else if (cmd === "exit") {
+            response.textContent = "Closing terminal in 5 seconds...";
+            
+            setTimeout(function() {
+              var p = document.createElement("div");
+              p.textContent = "Shutting down terminal...";
+              terminalOutput.appendChild(p);
+              terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }, 1000);
+
+            [3, 2, 1].forEach(function(num, index) {
+              setTimeout(function() {
+                var p = document.createElement("div");
+                p.textContent = String(num);
+                terminalOutput.appendChild(p);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+              }, (index + 2) * 1000);
+            });
+
+            setTimeout(function() {
+              closeApp("terminal");
+            }, 5000);
+          } else if (cmd === "home") {
+            response.textContent = "All windows minimized";
+            minimizeAllWindows();
           } else if (cmd !== "") {
             response.textContent = "Command not found: " + cmd;
           } else {

@@ -236,6 +236,13 @@ html.user-active .top-bar__center-oval {
   letter-spacing: 0.01em;
 }
 
+.app-window__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-window__minimize,
 .app-window__close {
   width: 32px;
   height: 28px;
@@ -245,7 +252,16 @@ html.user-active .top-bar__center-oval {
   color: #e6e6e6;
   font-size: 18px;
   line-height: 1;
-  cursor: default; /* no hover behavior requested */
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.app-window__minimize:hover,
+.app-window__close:hover {
+  background: rgba(55, 55, 60, 0.9);
 }
 
 .app-window__content {
