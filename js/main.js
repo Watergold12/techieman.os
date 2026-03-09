@@ -189,7 +189,16 @@
       var launch = e.target.closest("[data-launch-app]");
       if (launch) {
         e.preventDefault();
-        openApp(launch.getAttribute("data-launch-app"));
+        var appId = launch.getAttribute("data-launch-app");
+        openApp(appId);
+
+        // Terminal focus logic
+        if (appId === "terminal") {
+          setTimeout(function() {
+            var input = document.getElementById("terminal-input");
+            if (input) input.focus();
+          }, 300);
+        }
         return;
       }
       var closeBtn = e.target.closest("[data-app-close]");
@@ -197,6 +206,43 @@
         closeApp(closeBtn.getAttribute("data-app-close"));
       }
     });
+
+    /**
+     * Terminal specific logic
+     */
+    var terminalInput = document.getElementById("terminal-input");
+    var terminalOutput = document.getElementById("terminal-output");
+
+    if (terminalInput && terminalOutput) {
+      terminalInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          var cmd = terminalInput.value.trim();
+          var line = document.createElement("div");
+          line.innerHTML = '<span class="terminal-prompt">techieman@os:~$</span> ' + cmd;
+          terminalOutput.appendChild(line);
+
+          // Simple response logic
+          var response = document.createElement("div");
+          if (cmd === "help") {
+            response.textContent = "Available commands: help, clear, about, projects, contact";
+          } else if (cmd === "clear") {
+            terminalOutput.innerHTML = "";
+            response = null;
+          } else if (cmd === "about" || cmd === "projects" || cmd === "contact") {
+            response.textContent = "Opening " + cmd + "...";
+            openApp(cmd);
+          } else if (cmd !== "") {
+            response.textContent = "Command not found: " + cmd;
+          } else {
+            response = null;
+          }
+
+          if (response) terminalOutput.appendChild(response);
+          terminalInput.value = "";
+          terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+      });
+    }
   })();
 
   var dotRadius = 24;

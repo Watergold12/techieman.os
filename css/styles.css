@@ -371,6 +371,51 @@ html.user-active .top-bar__center-oval {
   object-fit: contain;
 }
 
+/* --------------------------------------------------------------------------
+   Terminal App Styles
+   -------------------------------------------------------------------------- */
+.terminal-content {
+  background: #0c0c0e; /* Even darker for terminal vibe */
+  font-family: inherit;
+  padding: 16px;
+  height: 480px; 
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#terminal-output {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #d8d8d8;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.terminal-input-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.terminal-prompt {
+  color: #50fa7b; /* Dracul-style green prompt */
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+#terminal-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f8f8f2;
+  font-family: inherit;
+  font-size: 14px;
+  flex: 1;
+  padding: 0;
+}
+
 /* Reduce motion preference */
 @media (prefers-reduced-motion: reduce) {
   .boot-overlay {

@@ -69,6 +69,9 @@
         <a class="dock-item" href="#contact" aria-label="Contact">
           <img src="assets/dock/contact.png" alt="" width="48" height="48" />
         </a>
+        <a class="dock-item" href="#terminal" aria-label="Terminal" data-launch-app="terminal">
+          <img src="assets/dock/terminal.png" alt="" width="48" height="48" />
+        </a>
       </div>
     </nav>
   </main>
@@ -96,6 +99,21 @@
       <p class="app-window__text">
         Projects app placeholder. Add your featured work, links, and case studies here.
       </p>
+    </div>
+  </section>
+
+  <!-- App window: Terminal -->
+  <section class="app-window terminal-window" id="app-terminal" aria-hidden="true" role="dialog" aria-label="Terminal">
+    <div class="app-window__titlebar">
+      <div class="app-window__title">Terminal</div>
+      <button class="app-window__close" type="button" data-app-close="terminal" aria-label="Close Terminal">×</button>
+    </div>
+    <div class="app-window__content terminal-content">
+      <div id="terminal-output"></div>
+      <div class="terminal-input-area">
+        <span class="terminal-prompt">techieman@os:~$</span>
+        <input id="terminal-input" autocomplete="off" aria-label="Terminal input">
+      </div>
     </div>
   </section>
 
