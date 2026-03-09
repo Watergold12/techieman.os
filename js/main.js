@@ -276,6 +276,21 @@
           } else if (cmd === "home") {
             response.textContent = "All windows minimized";
             minimizeAllWindows();
+          } else if (cmd === "sudo make me a sandwich") {
+            response.innerHTML = `
+<span style="color: #50fa7b;">       █████████</span>
+<span style="color: #50fa7b;">       █      █</span>
+<span style="color: #50fa7b;">       █  OS  █</span>
+
+<span style="color: #bd93f9;">OS:</span> techieman.os
+<span style="color: #bd93f9;">Host:</span> Portfolio System
+<span style="color: #bd93f9;">Kernel:</span> JavaScript 1.0
+<span style="color: #bd93f9;">Uptime:</span> Since page load
+<span style="color: #bd93f9;">Packages:</span> HTML, CSS, JavaScript
+<span style="color: #bd93f9;">Shell:</span> Fake Bash
+<span style="color: #bd93f9;">WM:</span> Custom Window Manager
+<span style="color: #bd93f9;">Terminal:</span> techieman-terminal
+<span style="color: #bd93f9;">Developer:</span> Vishal AA`.trim();
           } else if (cmd !== "") {
             response.textContent = "Command not found: " + cmd;
           } else {
@@ -288,6 +303,50 @@
         }
       });
     }
+  })();
+
+  /**
+   * Sidebar navigation logic (Ubuntu Settings style)
+   */
+  document.addEventListener("click", function (e) {
+    var sidebarItem = e.target.closest(".sidebar-item");
+    if (sidebarItem) {
+      var sectionId = sidebarItem.getAttribute("data-section");
+      var appWindow = sidebarItem.closest(".app-window");
+      
+      if (sectionId && appWindow) {
+        // Update active sidebar item
+        appWindow.querySelectorAll(".sidebar-item").forEach(function (item) {
+          item.classList.remove("active");
+        });
+        sidebarItem.classList.add("active");
+
+        // Update active section
+        appWindow.querySelectorAll(".app-section").forEach(function (section) {
+          section.classList.remove("active-section");
+        });
+        var targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+          targetSection.classList.add("active-section");
+        }
+      }
+    }
+  });
+
+  /**
+   * System Uptime Counter
+   */
+  (function() {
+    var startTime = Date.now();
+    
+    function updateUptime() {
+      var uptimeEl = document.getElementById("system-uptime");
+      if (!uptimeEl) return;
+      var diff = Math.floor((Date.now() - startTime) / 60000); // minutes
+      uptimeEl.textContent = diff + " min";
+      setTimeout(updateUptime, 60000);
+    }
+    updateUptime();
   })();
 
   var dotRadius = 24;
