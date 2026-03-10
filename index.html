@@ -62,15 +62,19 @@
         </a>
         <a class="dock-item" href="#about" aria-label="About" data-launch-app="about">
           <img src="assets/dock/about.png" alt="" width="48" height="48" />
+          <div class="dock-indicator"></div>
         </a>
         <a class="dock-item" href="#projects" aria-label="Projects" data-launch-app="projects">
           <img src="assets/dock/projects.png" alt="" width="48" height="48" />
+          <div class="dock-indicator"></div>
         </a>
         <a class="dock-item" href="#contact" aria-label="Contact" data-launch-app="contact">
           <img src="assets/dock/contact.png" alt="" width="48" height="48" />
+          <div class="dock-indicator"></div>
         </a>
         <a class="dock-item" href="#terminal" aria-label="Terminal" data-launch-app="terminal">
           <img src="assets/dock/terminal.png" alt="" width="48" height="48" />
+          <div class="dock-indicator"></div>
         </a>
       </div>
     </nav>
@@ -194,19 +198,33 @@
             <div class="section-content">
               <div class="section-content-inner">
                 <h2 class="section-title">Featured Work</h2>
-                <div class="project-list">
+                <div class="app-project-grid">
                   <div class="project-card">
-                    <h3 class="project-card__title">CognitionSync Platform</h3>
-                    <p class="project-card__desc">Multi-domain industrial intelligence platform for manufacturing and healthcare monitoring.</p>
-                    <div class="project-card__tags">
-                      <span class="tag">Next.js</span><span class="tag">Python</span><span class="tag">Chart.js</span>
+                    <div class="project-card__header">
+                      <div class="project-icon">🧠</div>
+                      <h3 class="project-card__title">CognitionSync</h3>
+                    </div>
+                    <p class="project-card__desc">
+                      Multi-domain industrial intelligence platform for manufacturing and healthcare monitoring with real-time analytics.
+                    </p>
+                    <div class="project-tech">Next.js • Python • Chart.js</div>
+                    <div class="project-actions">
+                      <a href="#" class="btn-github">GitHub</a>
+                      <a href="#" class="btn-demo">View</a>
                     </div>
                   </div>
                   <div class="project-card">
-                    <h3 class="project-card__title">Portfolio OS v2</h3>
-                    <p class="project-card__desc">A highly interactive, Ubuntu-inspired portfolio with a functional terminal and window manager.</p>
-                    <div class="project-card__tags">
-                      <span class="tag">Vanilla JS</span><span class="tag">SVG</span><span class="tag">CSS Animation</span>
+                    <div class="project-card__header">
+                      <div class="project-icon">🖥️</div>
+                      <h3 class="project-card__title">Portfolio OS v2</h3>
+                    </div>
+                    <p class="project-card__desc">
+                      A highly interactive, Ubuntu-inspired portfolio with a functional terminal, window manager, and system clock.
+                    </p>
+                    <div class="project-tech">Vanilla JS • SVG • CSS3</div>
+                    <div class="project-actions">
+                      <a href="#" class="btn-github">GitHub</a>
+                      <a href="#" class="btn-demo">Demo</a>
                     </div>
                   </div>
                 </div>
@@ -217,12 +235,19 @@
             <div class="section-content">
               <div class="section-content-inner">
                 <h2 class="section-title">Web Applications</h2>
-                <div class="project-list">
+                <div class="app-project-grid">
                   <div class="project-card">
-                    <h3 class="project-card__title">Dynamic Checkout Engine</h3>
-                    <p class="project-card__desc">A context-aware checkout system that updates dynamically based on user interaction.</p>
-                    <div class="project-card__tags">
-                       <span class="tag">React</span><span class="tag">Redux</span>
+                    <div class="project-card__header">
+                      <div class="project-icon">🛒</div>
+                      <h3 class="project-card__title">Checkout Engine</h3>
+                    </div>
+                    <p class="project-card__desc">
+                      A context-aware checkout system that updates dynamically based on user interaction and inventory state.
+                    </p>
+                    <div class="project-tech">React • Redux • Node.js</div>
+                    <div class="project-actions">
+                      <a href="#" class="btn-github">GitHub</a>
+                      <a href="#" class="btn-demo">Demo</a>
                     </div>
                   </div>
                 </div>
@@ -233,7 +258,22 @@
             <div class="section-content">
               <div class="section-content-inner">
                  <h2 class="section-title">Systems</h2>
-                 <p class="content-text">System-level utilities and backend architectures.</p>
+                 <div class="app-project-grid">
+                   <div class="project-card">
+                     <div class="project-card__header">
+                       <div class="project-icon">⚙️</div>
+                       <h3 class="project-card__title">OS Kernel Simulation</h3>
+                     </div>
+                     <p class="project-card__desc">
+                       A simulation of process scheduling and memory management in a Unix-like environment.
+                     </p>
+                     <div class="project-tech">C • Python • Bash</div>
+                     <div class="project-actions">
+                       <a href="#" class="btn-github">GitHub</a>
+                       <a href="#" class="btn-demo">Check</a>
+                     </div>
+                   </div>
+                 </div>
               </div>
             </div>
           </div>
@@ -241,7 +281,22 @@
             <div class="section-content">
               <div class="section-content-inner">
                  <h2 class="section-title">Experiments</h2>
-                 <p class="content-text">Small, focused experiments in UI/UX and animation.</p>
+                 <div class="app-project-grid">
+                   <div class="project-card">
+                     <div class="project-card__header">
+                       <div class="project-icon">🧪</div>
+                       <h3 class="project-card__title">WebGL Fluid Simulation</h3>
+                     </div>
+                     <p class="project-card__desc">
+                       Real-time fluid dynamics simulation in the browser using WebGL shaders.
+                     </p>
+                     <div class="project-tech">JS • WebGL • GLSL</div>
+                     <div class="project-actions">
+                       <a href="#" class="btn-github">GitHub</a>
+                       <a href="#" class="btn-demo">Run</a>
+                     </div>
+                   </div>
+                 </div>
               </div>
             </div>
           </div>

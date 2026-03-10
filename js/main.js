@@ -124,8 +124,90 @@
    * - Reuses existing CSS transition (opacity/scale/blur, 200ms).
    */
   (function () {
-    var currentAppId = null;
+    var currentAppId = null; // Focused app
     var isAnimating = false;
+    var runningApps = new Set();
+    var windowZ = 100;
+    var cascadeId = 0;
+    const CASCADE_OFFSET = 24;
+    const MAX_CASCADE = 6;
+
+    function updateIndicators() {
+      document.querySelectorAll("[data-launch-app]").forEach(function (icon) {
+        var appId = icon.getAttribute("data-launch-app");
+        var indicator = icon.querySelector(".dock-indicator");
+        if (!indicator) return;
+
+        indicator.classList.remove("dock-indicator-dot", "dock-indicator-line");
+
+        if (currentAppId === appId) {
+          indicator.classList.add("dock-indicator-line");
+        } else if (runningApps.has(appId)) {
+          indicator.classList.add("dock-indicator-dot");
+        }
+      });
+    }
+
+    function focusWindow(appId) {
+      // Remove focus from all windows
+      document.querySelectorAll(".app-window").forEach(function (win) {
+        win.classList.remove("is-focused");
+      });
+
+      if (!appId) {
+        currentAppId = null;
+        updateIndicators();
+        return;
+      }
+      var win = getWindowEl(appId);
+      if (!win) return;
+
+      windowZ++;
+      win.style.zIndex = windowZ;
+      win.classList.add("is-focused");
+      currentAppId = appId;
+      updateIndicators();
+    }
+
+    function minimizeApp(appId) {
+      var win = getWindowEl(appId);
+      if (!win) return;
+      win.classList.remove("is-open", "is-focused");
+      win.classList.add("is-minimized");
+      win.style.display = "none";
+      win.setAttribute("aria-hidden", "true");
+      setNextFocus();
+    }
+
+    function restoreApp(appId) {
+      var win = getWindowEl(appId);
+      if (!win) return;
+      win.classList.remove("is-minimized");
+      win.style.display = "block";
+      win.setAttribute("aria-hidden", "false");
+
+      requestAnimationFrame(function () {
+        win.classList.add("is-open");
+        focusWindow(appId);
+      });
+    }
+
+    function setNextFocus() {
+      var windows = Array.from(document.querySelectorAll(".app-window.is-open"));
+      if (windows.length === 0) {
+        focusWindow(null);
+        return;
+      }
+
+      // Sort by z-index descending
+      windows.sort(function (a, b) {
+        return parseInt(window.getComputedStyle(b).zIndex) - parseInt(window.getComputedStyle(a).zIndex);
+      });
+
+      var highest = windows[0];
+      var id = highest.id.replace("app-", "");
+      focusWindow(id);
+    }
 
     function getWindowEl(appId) {
       return document.getElementById("app-" + appId);
@@ -135,27 +217,36 @@
       var win = getWindowEl(appId);
       if (!win) return;
       if (isAnimating) return;
-      if (currentAppId === appId && win.style.display === "block" && win.classList.contains("is-open")) return;
-
-      // If another app is open, close it first, then open the requested one.
-      if (currentAppId && currentAppId !== appId) {
-        closeApp(currentAppId, function () {
-          openApp(appId);
-        });
-        return;
-      }
 
       isAnimating = true;
       currentAppId = appId;
+      runningApps.add(appId);
+      win.classList.remove("is-minimized");
+      
+      // Reset position to default (centered) for opening animation
+      win.style.top = "";
+      win.style.left = "";
+      win.style.margin = "";
+      
+      // Cascade positioning
+      var offsetX = (cascadeId % MAX_CASCADE) * CASCADE_OFFSET;
+      var offsetY = (cascadeId % MAX_CASCADE) * CASCADE_OFFSET;
+      win.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(0.92)`;
+      cascadeId++;
+
       win.style.display = "block";
       win.setAttribute("aria-hidden", "false");
+      focusWindow(appId);
 
       // Launch logic: next frame add .is-open so CSS transition runs.
       requestAnimationFrame(function () {
         win.classList.add("is-open");
+        // Maintain the offset in the open state
+        win.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1)`;
+        updateIndicators();
         window.setTimeout(function () {
           isAnimating = false;
-        }, 240); // keep existing timing (200ms + small buffer)
+        }, 240);
       });
     }
 
@@ -177,7 +268,8 @@
         win.removeEventListener("transitionend", onDone);
         win.style.display = "none";
         win.setAttribute("aria-hidden", "true");
-        if (currentAppId === appId) currentAppId = null;
+        runningApps.delete(appId);
+        setNextFocus();
         isAnimating = false;
         if (typeof done === "function") done();
       };
@@ -192,19 +284,43 @@
         win.setAttribute("aria-hidden", "true");
       });
       currentAppId = null;
+      updateIndicators();
     }
 
-    // Single delegated listener for dock launches (no per-app JS duplication).
+    // Single delegated listener for dock launches and window focus
     document.addEventListener("click", function (e) {
+      var isControl = e.target.closest(".app-window__controls");
+
+      // Focus window on click (if not clicking a control)
+      var windowClick = e.target.closest(".app-window");
+      if (windowClick && !isControl) {
+        var id = windowClick.id.replace("app-", "");
+        focusWindow(id);
+      }
+
       var launch = e.target.closest("[data-launch-app]");
       if (launch) {
         e.preventDefault();
         var appId = launch.getAttribute("data-launch-app");
-        openApp(appId);
+        var win = getWindowEl(appId);
+
+        var isRunning = runningApps.has(appId);
+        var isFocused = (currentAppId === appId);
+        var isMinimized = win && win.classList.contains("is-minimized");
+
+        if (!isRunning) {
+          openApp(appId);
+        } else if (isFocused) {
+          minimizeApp(appId);
+        } else if (isMinimized) {
+          restoreApp(appId);
+        } else {
+          focusWindow(appId);
+        }
 
         // Terminal focus logic
         if (appId === "terminal") {
-          setTimeout(function() {
+          setTimeout(function () {
             var input = document.getElementById("terminal-input");
             if (input) input.focus();
           }, 300);
@@ -218,14 +334,74 @@
       var minimizeBtn = e.target.closest("[data-app-minimize]");
       if (minimizeBtn) {
         var appId = minimizeBtn.getAttribute("data-app-minimize");
-        var win = document.getElementById("app-" + appId);
-        if (win) {
-          win.classList.remove("is-open");
-          win.style.display = "none";
-          win.setAttribute("aria-hidden", "true");
-        }
+        minimizeApp(appId);
       }
     });
+
+    /**
+     * Window Dragging Logic
+     */
+    (function () {
+      var isDragging = false;
+      var dragWin = null;
+      var startMouseX, startMouseY, startLeft, startTop;
+
+      document.addEventListener("mousedown", function (e) {
+        var titlebar = e.target.closest(".app-window__titlebar");
+        if (!titlebar || e.target.closest(".app-window__controls")) return;
+
+        var win = titlebar.closest(".app-window");
+        if (!win) return;
+
+        isDragging = true;
+        dragWin = win;
+
+        // Bring to front
+        var appId = win.id.replace("app-", "");
+        focusWindow(appId);
+
+        // Capture starting positions
+        startMouseX = e.clientX;
+        startMouseY = e.clientY;
+
+        // Get current computed position
+        var rect = win.getBoundingClientRect();
+        startLeft = rect.left;
+        startTop = rect.top;
+
+        // Switch to pixel-based positioning
+        // Remove transitions during drag for responsiveness
+        win.style.transition = "none";
+        win.style.transform = "none";
+        win.style.left = startLeft + "px";
+        win.style.top = startTop + "px";
+        win.style.margin = "0";
+
+        document.body.style.userSelect = "none";
+      });
+
+      document.addEventListener("mousemove", function (e) {
+        if (!isDragging || !dragWin) return;
+
+        var dx = e.clientX - startMouseX;
+        var dy = e.clientY - startMouseY;
+
+        dragWin.style.left = (startLeft + dx) + "px";
+        dragWin.style.top = (startTop + dy) + "px";
+      });
+
+      document.addEventListener("mouseup", function () {
+        if (isDragging) {
+          isDragging = false;
+          if (dragWin) {
+            // Restore transitions for subsequent open/close
+            dragWin.style.transition = "";
+          }
+          dragWin = null;
+          document.body.style.userSelect = "";
+        }
+      });
+    })();
 
     /**
      * Terminal specific logic
@@ -253,16 +429,16 @@
             openApp(cmd);
           } else if (cmd === "exit") {
             response.textContent = "Closing terminal in 5 seconds...";
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
               var p = document.createElement("div");
               p.textContent = "Shutting down terminal...";
               terminalOutput.appendChild(p);
               terminalOutput.scrollTop = terminalOutput.scrollHeight;
             }, 1000);
 
-            [3, 2, 1].forEach(function(num, index) {
-              setTimeout(function() {
+            [3, 2, 1].forEach(function (num, index) {
+              setTimeout(function () {
                 var p = document.createElement("div");
                 p.textContent = String(num);
                 terminalOutput.appendChild(p);
@@ -270,7 +446,7 @@
               }, (index + 2) * 1000);
             });
 
-            setTimeout(function() {
+            setTimeout(function () {
               closeApp("terminal");
             }, 5000);
           } else if (cmd === "home") {
@@ -313,7 +489,7 @@
     if (sidebarItem) {
       var sectionId = sidebarItem.getAttribute("data-section");
       var appWindow = sidebarItem.closest(".app-window");
-      
+
       if (sectionId && appWindow) {
         // Update active sidebar item
         appWindow.querySelectorAll(".sidebar-item").forEach(function (item) {
@@ -336,9 +512,9 @@
   /**
    * System Uptime Counter
    */
-  (function() {
+  (function () {
     var startTime = Date.now();
-    
+
     function updateUptime() {
       var uptimeEl = document.getElementById("system-uptime");
       if (!uptimeEl) return;

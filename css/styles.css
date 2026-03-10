@@ -226,6 +226,11 @@ html.user-active .top-bar__center-oval {
   z-index: 100;
 }
 
+.app-window.is-focused {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.8);
+}
+
 .app-window__titlebar {
   height: 40px;
   display: flex;
@@ -371,6 +376,7 @@ html.user-active .top-bar__center-oval {
 /* Icon hover: translate up, slight scale, smooth easing, no bounce */
 .dock-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 4px;
@@ -378,6 +384,7 @@ html.user-active .top-bar__center-oval {
   text-decoration: none;
   color: var(--text-muted);
   transition: transform 0.2s var(--ease-smooth), color 0.2s ease;
+  position: relative;
 }
 
 .dock-item:hover,
@@ -385,6 +392,30 @@ html.user-active .top-bar__center-oval {
   transform: translateY(-8px) scale(1.05);
   color: var(--text-primary);
   outline: none;
+}
+
+.dock-indicator {
+  height: 3px;
+  width: 0;
+  background: white;
+  margin-top: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dock-indicator.dock-indicator-dot {
+  opacity: 0.8;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+.dock-indicator.dock-indicator-line {
+  opacity: 1;
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
 }
 
 .dock-item img {
@@ -572,59 +603,104 @@ html.user-active .top-bar__center-oval {
   margin-bottom: 16px;
 }
 
-/* Project Cards */
-.project-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* Project Cards (Software Center Style) */
+.app-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding-bottom: 24px;
 }
 
 .project-card {
-  padding: 16px;
-  background: rgba(40, 40, 45, 0.3);
+  background: #1f1f1f;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  transition: border-color 0.2s ease;
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .project-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.15);
+  background: #252525;
+}
+
+.project-card__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.project-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: #333;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
 }
 
 .project-card__title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin: 0;
   color: #fff;
 }
 
 .project-card__desc {
   font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 12px;
-  line-height: 1.4;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  flex: 1;
 }
 
-.project-card__tags {
+.project-tech {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+
+.project-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  gap: 10px;
 }
 
-.tag {
-  font-size: 10px;
-  padding: 2px 7px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-  color: #aaa;
-}
-
-.project-link {
-  display: inline-block;
-  margin-top: 12px;
+.btn-github,
+.btn-demo {
+  padding: 8px 12px;
+  border-radius: 6px;
   font-size: 12px;
-  color: #50fa7b;
   text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.btn-github {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.btn-github:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-demo {
+  background: #e95420; /* Ubuntu orange */
+  color: #fff;
+}
+
+.btn-demo:hover {
+  background: #f4662f;
 }
 
 /* Contact Items */
