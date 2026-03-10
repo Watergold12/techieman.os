@@ -188,7 +188,7 @@ html.user-active .top-bar__center-oval {
 .app-window {
   display: none; /* hidden until launched */
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   z-index: 10;
 

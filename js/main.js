@@ -128,9 +128,7 @@
     var isAnimating = false;
     var runningApps = new Set();
     var windowZ = 100;
-    var cascadeId = 0;
-    const CASCADE_OFFSET = 24;
-    const MAX_CASCADE = 6;
+    const STACK_OFFSET = 20;
 
     function updateIndicators() {
       document.querySelectorAll("[data-launch-app]").forEach(function (icon) {
@@ -228,11 +226,10 @@
       win.style.left = "";
       win.style.margin = "";
       
-      // Cascade positioning
-      var offsetX = (cascadeId % MAX_CASCADE) * CASCADE_OFFSET;
-      var offsetY = (cascadeId % MAX_CASCADE) * CASCADE_OFFSET;
+      // Fixed small offset from center
+      var offsetX = STACK_OFFSET;
+      var offsetY = STACK_OFFSET;
       win.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(0.92)`;
-      cascadeId++;
 
       win.style.display = "block";
       win.setAttribute("aria-hidden", "false");
