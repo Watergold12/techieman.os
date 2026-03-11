@@ -241,6 +241,9 @@
         // Maintain the offset in the open state
         win.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1)`;
         updateIndicators();
+        if (appId === "terminal") {
+          window.dispatchEvent(new CustomEvent("terminal-launched"));
+        }
         window.setTimeout(function () {
           isAnimating = false;
         }, 240);
@@ -407,6 +410,37 @@
     var terminalOutput = document.getElementById("terminal-output");
 
     if (terminalInput && terminalOutput) {
+      (function() {
+        var hasShownTerminalBanner = false;
+        function showTerminalBanner() {
+          if (hasShownTerminalBanner) return;
+          hasShownTerminalBanner = true;
+          var banner = [
+            "  ______          _     _                         ",
+            " |  ____|        | |   (_)                        ",
+            " | |__ ___   ___ | |__  _  ___   _ __ ___   ___  ___ ",
+            " |  __/ _ \\ / _ \\| '_ \\| |/ _ \\ | |_ \\ _ \\ / _ \\/ __|",
+            " | | | (_) | (_) | (_) | |  __/ | | | | | | (_) \\__ \\",
+            " |_|  \\___/ \\___/|____/|_|\\___| |_| |_| |_|\\___/|___/",
+            "",
+            "Welcome to techieman.os",
+            "Interactive developer portfolio environment",
+            "",
+            'Type "help" to view commands',
+            'Type "about" to know more about me',
+            ""
+          ];
+          banner.forEach(function(l) {
+            var div = document.createElement("div");
+            div.style.whiteSpace = "pre";
+            div.textContent = l;
+            terminalOutput.appendChild(div);
+          });
+          terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+        window.addEventListener("terminal-launched", showTerminalBanner);
+      })();
+
       terminalInput.addEventListener("keydown", function (e) {
         if (e.key === "Enter") {
           var cmd = terminalInput.value.trim();
@@ -418,7 +452,7 @@
           var response = document.createElement("div");
           if (cmd === "help") {
             response.textContent = "Available commands: help, clear, about, projects, contact, exit, home";
-          } else if (cmd === "clear") {
+          } else if (cmd === "cls") {
             terminalOutput.innerHTML = "";
             response = null;
           } else if (cmd === "about" || cmd === "projects" || cmd === "contact") {
