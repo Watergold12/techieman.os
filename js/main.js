@@ -415,13 +415,22 @@
         function showTerminalBanner() {
           if (hasShownTerminalBanner) return;
           hasShownTerminalBanner = true;
-          var banner = [
+          
+          var asciiArt = [
             "  ______          _     _                         ",
             " |  ____|        | |   (_)                        ",
             " | |__ ___   ___ | |__  _  ___   _ __ ___   ___  ___ ",
             " |  __/ _ \\ / _ \\| '_ \\| |/ _ \\ | |_ \\ _ \\ / _ \\/ __|",
             " | | | (_) | (_) | (_) | |  __/ | | | | | | (_) \\__ \\",
-            " |_|  \\___/ \\___/|____/|_|\\___| |_| |_| |_|\\___/|___/",
+            " |_|  \\___/ \\___/|____/|_|\\___| |_| |_| |_|\\___/|___/"
+          ].join("\n");
+
+          var pre = document.createElement("pre");
+          pre.className = "terminal-banner";
+          pre.textContent = asciiArt;
+          terminalOutput.appendChild(pre);
+
+          var infoLines = [
             "",
             "Welcome to techieman.os",
             "Interactive developer portfolio environment",
@@ -430,9 +439,9 @@
             'Type "about" to know more about me',
             ""
           ];
-          banner.forEach(function(l) {
+
+          infoLines.forEach(function(l) {
             var div = document.createElement("div");
-            div.style.whiteSpace = "pre";
             div.textContent = l;
             terminalOutput.appendChild(div);
           });

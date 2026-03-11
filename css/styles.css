@@ -450,6 +450,14 @@ html.user-active .top-bar__center-oval {
   line-height: 1.6;
 }
 
+.terminal-banner {
+  color: #4da6ff; /* blue banner */
+  font-family: inherit;
+  line-height: 1.2;
+  margin: 0;
+  white-space: pre;
+}
+
 .terminal-input-area {
   display: flex;
   align-items: center;
