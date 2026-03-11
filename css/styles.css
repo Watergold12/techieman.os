@@ -751,3 +751,26 @@ html.user-active .top-bar__center-oval {
     transform: none;
   }
 }
+
+/* Custom Cursor */
+body {
+  cursor: none;
+}
+
+* {
+    cursor: none !important;
+}
+
+#custom-cursor {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  background-image: url("../assets/cursor/cursor.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}

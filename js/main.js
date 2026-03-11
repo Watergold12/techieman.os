@@ -631,3 +631,30 @@
     hero.addEventListener("mousemove", onMouseMove, { passive: true });
   }
 })();
+
+/**
+ * Custom Cursor System
+ */
+(function () {
+  const cursor = document.getElementById("custom-cursor");
+  if (!cursor) return;
+
+  document.addEventListener("mousemove", (e) => {
+    cursor.style.left = e.clientX + "px";
+    cursor.style.top = e.clientY + "px";
+  });
+
+  const clickableElements = document.querySelectorAll(
+    "a, button, .dock-item, .app-window__titlebar"
+  );
+
+  clickableElements.forEach((el) => {
+    el.addEventListener("mouseenter", () => {
+      cursor.style.backgroundImage = "url('assets/cursor/cursor-hand2.png')";
+    });
+
+    el.addEventListener("mouseleave", () => {
+      cursor.style.backgroundImage = "url('assets/cursor/cursor.png')";
+    });
+  });
+})();
